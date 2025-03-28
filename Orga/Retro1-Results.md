@@ -17,4 +17,4 @@
   - Pipelines
   - API
   - Nuxt
-- 
+- Open communication
