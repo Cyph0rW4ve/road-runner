@@ -1,0 +1,11 @@
+name: RoadRunner Action
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  First-Test-Job:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This is triggered by a push on main"
