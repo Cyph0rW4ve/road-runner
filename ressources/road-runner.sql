@@ -58,7 +58,7 @@ CREATE TABLE trucks (
 );
 
 
-INSERT INTO trucks (id, brand, name, fuel_tank, liters_per_100km, max_weight)
+INSERT INTO trucks (id, brand, name, fuel_tank, liters_per_100km, max_weight, horsepower)
 VALUES
     ('0000', 'Scania', 'R2016', 700, 30, 25500, 730),
     ('0001', 'Volvo', 'FH16 2016', 600, 25, 26000, 750),
@@ -73,4 +73,4 @@ CREATE TABLE owned_trucks (
     id CHAR(4) NOT NULL PRIMARY KEY,
     truck_id CHAR(4),
     Current_Driver varchar(255) NULL
-)
+);
