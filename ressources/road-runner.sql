@@ -74,3 +74,11 @@ CREATE TABLE owned_trucks (
     truck_id CHAR(4),
     Current_Driver varchar(255) NULL
 );
+
+
+CREATE TABLE drivers (
+    id CHAR(4) NOT NULL PRIMARY KEY,
+    name varchar(255),
+    free_drive_time INT,
+    available_for_next_job DATE NULL
+);
