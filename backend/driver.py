@@ -18,9 +18,6 @@ class Driver:
     def new_driver(self, new_id):
         pass
 
-    def get_remaining_drive_time(self):
-        return self.free_drive_time
-
     def update_free_drive_time(self, seconds):
         self.free_drive_time -= seconds
 
@@ -29,6 +26,9 @@ class Driver:
 
     def big_break(self):
         self.open_break_duration += 11 * 60 * 60      # 11 hours in seconds
+
+    def get_remaining_drive_time(self):
+        return self.free_drive_time
 
     def get_break_duration_sum(self):
         return self.open_break_duration
