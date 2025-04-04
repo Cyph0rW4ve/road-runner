@@ -49,11 +49,31 @@ class TrucksResponse(BaseModel):
     class Config:
         orm_mode = True
 
+class DriversRoute(BaseModel):
+    from_location: str
+    to_location: str
+    cargo_weight: float
+    deadline: str
+    truck: str
+
+
 app = FastAPI()
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/calculateRoute")
+def return_calculated_route(driversRoute: DriversRoute):
+    return {"message": driversRoute}
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
