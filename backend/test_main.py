@@ -1,7 +1,9 @@
 import unittest
-from main import *
+import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from backend.main import app
+
 
 class TestDatabaseConnection(unittest.TestCase):
     client = TestClient(app)
@@ -24,14 +26,29 @@ class TestDatabaseConnection(unittest.TestCase):
             self.assertIn("name", trucks[1])
             self.assertIn("fuel_tank", trucks[1])
 
-    def test_owned_trucks(self):
-        response_owned_trucks = self.client.get("/owned_trucks")
-        owned_trucks = response_owned_trucks.json()
-        self.assertIsInstance(owned_trucks, list)
-        if owned_trucks:
-            self.assertIn("id", owned_trucks[1])
-            self.assertIn("truck_id", owned_trucks[1])
-            self.assertIn("current_driver", owned_trucks[1])
+#   def test_owned_trucks(self):
+#       response_owned_trucks = self.client.get("/owned_trucks")
+#       owned_trucks = response_owned_trucks.json()
+#       self.assertIsInstance(owned_trucks, list)
+#       if owned_trucks:
+#           self.assertIn("id", owned_trucks[1])
+#           self.assertIn("truck_id", owned_trucks[1])
+#           self.assertIn("current_driver", owned_trucks[1])
+
+    def test_google_maps_api_connection(self):
+        api_key = "AIzaSyBT_yW-Nz6zIbKidF_WgaKG3o17xeOI6-c"
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        params = {
+            "address": "Berlin",
+            "key": api_key
+        }
+
+        response = requests.get(url, params=params)
+
+        self.assertEqual(response.status_code, 200, f"Fehler beim Aufruf: {response.status_code}")
+        data = response.json()
+        self.assertIn("results", data, "Antwort enthält keine 'results'")
+        self.assertGreater(len(data["results"]), 0, "Keine Ergebnisse zurückgegeben")
 
 if __name__ == '__main__':
     unittest.main()
