@@ -1,15 +1,20 @@
 from typing import Union, List
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import create_engine, Column, Integer, String, CHAR, VARCHAR
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
+import googlemaps
 
 
-DATABASE_URL = "mysql+pymysql://root:YOUR_PASSWORD@localhost/road_runner"
+
+DATABASE_URL = "mysql+pymysql://root:YOURPASSWORD@localhost/road_runner"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+gmaps = googlemaps.Client(key="")
 
 
 class CargoTypes(Base):
@@ -59,9 +64,28 @@ class DriversRoute(BaseModel):
 
 app = FastAPI()
 
+def calculate_distance_and_duration(from_location: str, to_location: str):
+    try: 
+        directions_result = gmaps.directions(from_location, to_location)
+        distance = directions_result[0]['legs'][0]['distance']['text']
+        duration = directions_result[0]['legs'][0]['duration']['text']
+
+        return distance, duration
+    except Exception as e:
+        print(f"Error fetching directions: {e}")
+        raise HTTPException(status_code=500, detail="Error calculating route")
+
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
+origins = [
+    "http://localhost:3000",
+    "http://localhost.tiangolo.com",
+    "https://localhost.tiangolo.com",
+    "http://localhost",
+    "http://localhost:8080",
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -71,9 +95,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/calculateRoute")
+@app.post("/calculateRoute")
 def return_calculated_route(driversRoute: DriversRoute):
-    return {"message": driversRoute}
+    distance, duration = calculate_distance_and_duration(driversRoute.from_location, driversRoute.to_location)
+
+    #driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
+    #total_duration = driver_time_calculator.calculate_time(1, duration)
+    return {
+        "from": driversRoute.from_location,
+        "to": driversRoute.to_location,
+        "cargo_weight": driversRoute.cargo_weight,
+        "deadline": driversRoute.deadline,
+        "truck": driversRoute.truck,
+        "distance": distance,
+        "duration": duration
+    }
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):

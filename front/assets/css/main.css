@@ -48,7 +48,8 @@ html, body {
 }
 
 .right-container {
-    background-color: rgba(236,27,129, 0.3);
+    /*background-color: rgba(236,27,129, 0.3);*/
+    background-color: rgba(101, 233, 227, 0.3);
     width: 900px;
 }
 
@@ -122,5 +123,63 @@ html, body {
     font-weight: bold;
     margin-bottom: 50px;
   }
+
+  .response-card {
+    background-color: rgba(236,27,129, 0.4);
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.truck-image {
+    width: 100px; /* Adjust the size as necessary */
+    height: auto;
+    margin-right: 15px;
+}
+
+.company-info {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+.company-name {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #27918c;
+}
+
+.route-info {
+    color: #fff;
+}
+
+.card-body {
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.card-body strong {
+  color: #27918c;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: #fff;
+}
+
+.card-footer strong {
+  color: #27918c;
+}
 
   
