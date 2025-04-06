@@ -1,0 +1,185 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    background: #0e0e14;
+}
+
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    padding: 30px 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+ width: 96%;   
+ height: 70vh;
+ background-color: #0e0e14;
+ display: flex;
+ justify-content: space-between;
+ align-items: center;
+ position: absolute;
+ top: 150px;
+}
+
+.left-container,
+.right-container {
+    height: 100%;
+    border: 2px solid #fff;
+    border-radius: 50px;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.left-container {
+    background-color: rgba(101, 233, 227, 0.3);
+    width: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.right-container {
+    /*background-color: rgba(236,27,129, 0.3);*/
+    background-color: rgba(101, 233, 227, 0.3);
+    width: 900px;
+}
+
+.form {
+    width: 100%;
+}
+
+.input-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.inputField {
+    width: 200px;
+    height: 40px;
+    border: 2px solid #65e9e3;
+    border-radius: 20px;
+    padding: 10px;
+    color: #65e9e3;
+    font-weight: bold;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    position: absolute;
+    top: 0px;
+    left: 30px;
+  }
+  
+  .logo {
+    height: 150px;
+    margin-right: 10px; 
+  }
+
+  .form-container {
+    max-width: 400px; 
+    margin: 0 auto; 
+    padding: 20px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column; 
+    gap: 15px; 
+  }
+
+  .centered-button {
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+    background-color: #27918c;
+    transition: background-color 0.3s ease;
+  }
+  .centered-button:hover {
+    background-color: #1f7a74;  
+    cursor: pointer;
+  }
+
+  .form-title {
+    font-size: 30px;
+    color: #fff;
+    font-weight: bold;
+    margin-bottom: 50px;
+  }
+
+  .response-card {
+    background-color: rgba(236,27,129, 0.4);
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.truck-image {
+    width: 100px; /* Adjust the size as necessary */
+    height: auto;
+    margin-right: 15px;
+}
+
+.company-info {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+}
+
+.company-name {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #27918c;
+}
+
+.route-info {
+    color: #fff;
+}
+
+.card-body {
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.card-body strong {
+  color: #27918c;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    color: #fff;
+}
+
+.card-footer strong {
+  color: #27918c;
+}
+
+  
