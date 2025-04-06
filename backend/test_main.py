@@ -4,7 +4,6 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from backend.main import app
 
-
 class TestDatabaseConnection(unittest.TestCase):
     client = TestClient(app)
     def test_cargo_types(self):
