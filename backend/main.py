@@ -61,6 +61,7 @@ class DriversRoute(BaseModel):
     cargo_weight: float
     deadline: str
     truck: str
+    cargo: str
 
 
 app = FastAPI()
@@ -108,6 +109,7 @@ def return_calculated_route(driversRoute: DriversRoute):
         "cargo_weight": driversRoute.cargo_weight,
         "deadline": driversRoute.deadline,
         "truck": driversRoute.truck,
+        "cargo": driversRoute.cargo,
         "distance": distance,
         "duration": total_duration
     }
