@@ -14,9 +14,10 @@
                     <span class="inline-flex bg-(--ui-bg) px-1">To</span>
                     </label>
                 </UInput>
+                <USelect v-model="valueSelectCargo" :items="cargoItems" class="w-90" />
                 <UInput v-model="valueCargo" placeholder="" :ui="{ base: 'peer' }" color="neutral">
                     <label class="pointer-events-none absolute left-0 -top-2.5 text-(--ui-text-highlighted) text-xs font-medium px-1.5 transition-all peer-focus:-top-2.5 peer-focus:text-(--ui-text-highlighted) peer-focus:text-xs peer-focus:font-medium peer-placeholder-shown:text-sm peer-placeholder-shown:text-(--ui-text-dimmed) peer-placeholder-shown:top-1.5 peer-placeholder-shown:font-normal">
-                    <span class="inline-flex bg-(--ui-bg) px-1">Cargo weight</span>
+                    <span class="inline-flex bg-(--ui-bg) px-1">Cargo weight (kg)</span>
                     </label>
                 </UInput>
                 <UPopover>
@@ -45,11 +46,12 @@
                 <div class="card-body">
                     <p><strong>Expected Arrival:</strong> {{ responseData.deadline }}</p>
                     <p><strong>Truck:</strong> {{ responseData.truck }}</p>
+                    <p><strong>Cargo:</strong> {{ responseData.cargo }}</p>
                     <p><strong>Cargo Weight:</strong> {{ responseData.cargo_weight }} kg</p>
                 </div>
                 <div class="card-footer">
                     <span class="distance"><strong>Distance:</strong> {{ responseData.distance }}</span>
-                    <span class="duration"><strong>Duration:</strong> {{ responseData.duration }}</span>
+                    <span class="duration"><strong>Duration:</strong> {{ formatDuration(Number(responseData.duration)) }}</span>
                 </div>
             </div>
         </div>
@@ -76,19 +78,22 @@
     truck: string;
     distance: string; 
     duration: string; 
+    cargo: string
 }
 
     const df = new DateFormatter('en-US', {
     dateStyle: 'medium'
     })
 
-    const modelValue = shallowRef(new CalendarDate(2022, 1, 10))
+    const modelValue = shallowRef(new CalendarDate(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate()));
     const valueFrom = ref('')
     const valueTo = ref('')
     const valueCargo = ref('')
 
     const items = ref<string[]>([])
     const valueSelect = ref('')
+    const cargoItems = ref<string[]>([])
+    const valueSelectCargo = ref('')
 
     const responseData = ref<RouteResponse | null>(null) 
 
@@ -104,13 +109,26 @@
       }
     }
 
+    const fetchCargo = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/cargo_types/')
+        cargoItems.value = response.data.map((cargo: {cargo_name: string}) => cargo.cargo_name)
+        if(cargoItems.value.length > 0) {
+          valueSelectCargo.value = cargoItems.value[0]
+        } 
+      } catch (error) {
+        console.error("An error occured while fetching cargo: ", error)
+      }
+    }
+
     const handleCalculateRoute = async () => {
       const driversRoute = {
         from_location: valueFrom.value,
         to_location: valueTo.value,
         cargo_weight: valueCargo.value,
         deadline: modelValue.value.toString(),
-        truck: valueSelect.value
+        truck: valueSelect.value,
+        cargo: valueSelectCargo.value
       }
 
       try {
@@ -133,8 +151,15 @@
       return brandToImageMap[truckBrand] || truckImage1
     }
 
+    const formatDuration = (seconds: number): string => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${hours}h ${minutes}m`;
+    }
+
     onMounted(() => {
-      fetcTrucks()
+      fetcTrucks(),
+      fetchCargo()
     })
   </script>
   
