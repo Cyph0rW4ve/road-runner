@@ -1,4 +1,4 @@
-from backend.driver import Driver
+from driver import Driver
 from fastapi.middleware.cors import CORSMiddleware
 
 
@@ -12,21 +12,22 @@ class DriverTimeCalculator:
         self.remaining_delivery_time = 0
 
     def calculate_time(self, driver_id, calculated_route_duration):
-        self.driver.new_driver(driver_id)
-        self.total_duration, self.remaining_delivery_time = calculated_route_duration
+        #self.driver.new_driver(driver_id)
+        self.total_duration = calculated_route_duration
+        self.remaining_delivery_time = calculated_route_duration
 
         remaining_drive_time_today = self.driver.get_remaining_drive_time()
 
         if calculated_route_duration < remaining_drive_time_today:
             self.driver.update_free_drive_time(calculated_route_duration)
-            self.driver.update_stats_to_db()
+            #self.driver.update_stats_to_db()
             return self.total_duration
 
         if calculated_route_duration == remaining_drive_time_today:
             self.driver.update_free_drive_time(self.drivable_seconds_per_day)
             self.driver.small_break()
             self.driver.big_break()
-            self.driver.update_stats_to_db()
+            #self.driver.update_stats_to_db()
             return self.total_duration
 
 
@@ -39,12 +40,12 @@ class DriverTimeCalculator:
         self.handle_last_day()
 
 
-        self.driver.update_stats_to_db()
+        #self.driver.update_stats_to_db()
         return self.total_duration
 
 
-    def handle_first_day(self):
-        self.remaining_delivery_time -= self.remaining_drive_time_today
+    def handle_first_day(self, remaining_drive_time_today):
+        self.remaining_delivery_time -= remaining_drive_time_today
         self.total_duration += self.small_break
         self.total_duration += self.big_break
 

@@ -6,15 +6,16 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 import googlemaps
+import drivertimecalculator
 
 
 
-DATABASE_URL = "mysql+pymysql://root:YOURPASSWORD@localhost/road_runner"
+DATABASE_URL = "mysql+pymysql://root:MoneyInTheBank24!@localhost/road_runner"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-gmaps = googlemaps.Client(key="")
+gmaps = googlemaps.Client(key="AIzaSyBT_yW-Nz6zIbKidF_WgaKG3o17xeOI6-c")
 
 
 class CargoTypes(Base):
@@ -68,7 +69,7 @@ def calculate_distance_and_duration(from_location: str, to_location: str):
     try: 
         directions_result = gmaps.directions(from_location, to_location)
         distance = directions_result[0]['legs'][0]['distance']['text']
-        duration = directions_result[0]['legs'][0]['duration']['text']
+        duration = directions_result[0]['legs'][0]['duration']['value']
 
         return distance, duration
     except Exception as e:
@@ -99,8 +100,8 @@ app.add_middleware(
 def return_calculated_route(driversRoute: DriversRoute):
     distance, duration = calculate_distance_and_duration(driversRoute.from_location, driversRoute.to_location)
 
-    #driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
-    #total_duration = driver_time_calculator.calculate_time(1, duration)
+    driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
+    total_duration = driver_time_calculator.calculate_time("D001", duration)
     return {
         "from": driversRoute.from_location,
         "to": driversRoute.to_location,
@@ -108,7 +109,7 @@ def return_calculated_route(driversRoute: DriversRoute):
         "deadline": driversRoute.deadline,
         "truck": driversRoute.truck,
         "distance": distance,
-        "duration": duration
+        "duration": total_duration
     }
 
 @app.get("/items/{item_id}")

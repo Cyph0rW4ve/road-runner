@@ -3,10 +3,10 @@ from datetime import datetime
 
 class Driver:
     def __init__(self):
-        self.id = "0001"
-        self.free_drive_time = 0
+        self.id = "D001"
+        self.free_drive_time = 32400
         self.open_break_duration: int = 0
-        self.available_for_next_job: datetime
+        self.available_for_next_job = None
 
 
     def read_stats(self):
