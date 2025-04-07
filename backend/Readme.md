@@ -28,7 +28,7 @@ python -m pip install --upgrade pip
 
 ## 4. Install Dependencies  
 Install FastAPI and its required dependencies:  
-```sh
+```sh.venv\Scripts\activate.venv\Scripts\activate
 pip install "fastapi[standard]"
 ```
 

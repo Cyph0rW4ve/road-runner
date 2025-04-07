@@ -1,0 +1,53 @@
+import unittest
+import requests
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
+from backend.main import app
+
+class TestDatabaseConnection(unittest.TestCase):
+    client = TestClient(app)
+    def test_cargo_types(self):
+        response_cargo = self.client.get("/cargo_types")
+        cargo_types = response_cargo.json()
+        self.assertEqual(response_cargo.status_code, 200)
+        self.assertIsInstance(cargo_types, list)
+        if cargo_types:
+            self.assertIn("id", cargo_types[1])
+            self.assertIn("cargo_name", cargo_types[1])
+            self.assertIn("cargo_type", cargo_types[1])
+
+    def test_trucks(self):
+        response_trucks = self.client.get("/trucks")
+        trucks = response_trucks.json()
+        self.assertIsInstance(trucks, list)
+        if trucks:
+            self.assertIn("id", trucks[1])
+            self.assertIn("name", trucks[1])
+            self.assertIn("fuel_tank", trucks[1])
+
+#   def test_owned_trucks(self):
+#       response_owned_trucks = self.client.get("/owned_trucks")
+#       owned_trucks = response_owned_trucks.json()
+#       self.assertIsInstance(owned_trucks, list)
+#       if owned_trucks:
+#           self.assertIn("id", owned_trucks[1])
+#           self.assertIn("truck_id", owned_trucks[1])
+#           self.assertIn("current_driver", owned_trucks[1])
+
+    def test_google_maps_api_connection(self):
+        api_key = "AIzaSyBT_yW-Nz6zIbKidF_WgaKG3o17xeOI6-c"
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        params = {
+            "address": "Berlin",
+            "key": api_key
+        }
+
+        response = requests.get(url, params=params)
+
+        self.assertEqual(response.status_code, 200, f"Fehler beim Aufruf: {response.status_code}")
+        data = response.json()
+        self.assertIn("results", data, "Antwort enthält keine 'results'")
+        self.assertGreater(len(data["results"]), 0, "Keine Ergebnisse zurückgegeben")
+
+if __name__ == '__main__':
+    unittest.main()
