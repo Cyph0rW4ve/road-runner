@@ -82,3 +82,13 @@ CREATE TABLE drivers (
     free_drive_time INT,
     available_for_next_job DATE NULL
 );
+
+CREATE TABLE employees (
+    id int NOT NULL PRIMARY KEY,
+    user_name varchar(50),
+    password varchar(50),
+    role varchar(50)
+);
+
+INSERT INTO employees (id, user_name, password, role)
+VALUES (1, "lorenzo@roadrunner.com", "$2a$12$wgDQurvFlCAca40IgHUguOmmoK0oJTjvynU1.ZSk/PnG01wsf8wVK", "driver");

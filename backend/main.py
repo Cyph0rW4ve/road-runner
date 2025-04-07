@@ -7,6 +7,8 @@ from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 import googlemaps
 import drivertimecalculator
+from fastapi.security import OAuth2PasswordRequestForm
+from passlib.context import CryptContext
 
 
 
@@ -63,6 +65,13 @@ class DriversRoute(BaseModel):
     truck: str
     cargo: str
 
+class Employee(Base):
+    __tablename__ = "employees"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_name = Column(VARCHAR(50), unique=True, nullable=False)
+    password = Column(VARCHAR(50), nullable=False)  
+    role = Column(VARCHAR(50), nullable=False)
 
 app = FastAPI()
 
@@ -76,6 +85,14 @@ def calculate_distance_and_duration(from_location: str, to_location: str):
     except Exception as e:
         print(f"Error fetching directions: {e}")
         raise HTTPException(status_code=500, detail="Error calculating route")
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_user(db: Session, user_name: str):
+    return db.query(Employee).filter(Employee.user_name == user_name).first()
 
 @app.get("/")
 def read_root():
@@ -142,3 +159,14 @@ def read_trucks(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
     except Exception as e:
         print(f"Error fetching trucks: {e}")  
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
+@app.post("/login")
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = get_user(db, form_data.username)
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    
+    if user.role != "driver":
+        raise HTTPException(status_code=403, detail="Access forbidden: not a driver")
+    
+    return {"message": "Login successful", "role": user.role}

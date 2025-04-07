@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div v-if="isAuthenticated" class="container">
       <div class="left-container">
         <div class="form-container">
             <h1 class="form-title">Fill out the form:</h1>
@@ -68,6 +68,8 @@
     import truckImage3 from '../assets/img/3.png'
     import truckImage4 from '../assets/img/4.png'
     import truckImage5 from '../assets/img/5.png'
+    import { useAuthStore } from '@/stores/authStore'
+
     
 
     interface RouteResponse {
@@ -79,7 +81,10 @@
     distance: string; 
     duration: string; 
     cargo: string
-}
+    }
+
+    const authStore = useAuthStore();
+    const isAuthenticated = computed(() => authStore.isAuthenticated);
 
     const df = new DateFormatter('en-US', {
     dateStyle: 'medium'
