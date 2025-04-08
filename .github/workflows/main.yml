@@ -79,7 +79,7 @@ jobs:
         pylint backend/**/*.py --output-format=text --disable=R0801 --max-line-length=120 > pylint-report.txt# Extract the score from the output
         score=$(grep -oP 'Your code has been rated at \K[0-9]+.[0-9]+' pylint-report.txt)
         echo "Pylint score: $score"# Set a condition to fail the job if the score is below 5
-        if [ $(echo "$score < 5" | bc) -eq 1 ]; then
+        if (( $(echo "$score < 5" | bc -l) )); then
           echo "Pylint score is below 5. Failing the pipeline."
           exit 1
         fi
