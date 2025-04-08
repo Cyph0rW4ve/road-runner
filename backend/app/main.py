@@ -6,13 +6,13 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 import googlemaps
-import drivertimecalculator
+from app import drivertimecalculator
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from fuel_consumption_calculator import FuelConsumptionCalculator
-from fetchtrucks import fetch_trucks
+from app.fuel_consumption_calculator import FuelConsumptionCalculator
+from app.fetchtrucks import fetch_trucks
 
-DATABASE_URL = "mysql+pymysql://root:1234@localhost/road_runner"
+DATABASE_URL = "mysql+pymysql://root:MoneyInTheBank24!@localhost/road_runner"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

@@ -1,4 +1,4 @@
-from driver import Driver
+from app.driver import Driver
 
 
 class DriverTimeCalculator:
@@ -47,8 +47,11 @@ class DriverTimeCalculator:
 
     def handle_first_day(self, remaining_drive_time_today):
         self.remaining_delivery_time -= remaining_drive_time_today
+        self.driver.small_break()
+        self.driver.big_break()
         self.total_duration += self.small_break
         self.total_duration += self.big_break
+
 
     def handle_full_day(self):
         self.remaining_delivery_time -= self.drivable_seconds_per_day
