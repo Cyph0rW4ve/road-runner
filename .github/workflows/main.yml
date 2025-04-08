@@ -76,13 +76,5 @@ jobs:
 
     - name: Run Pylint
       run: |
-        pylint backend/**/*.py --output-format=text --disable=R0801 --max-line-length=120 > pylint-report.txt# Extract the score from the output
-        last_line=$(tail -n 1 pylint-report.txt)
-        echo "Last line of Pylint output: $last_line"
-        score=$(echo "$last_line" | grep -oP '[0-9]+.[0-9]+')
-        echo "Pylint score: $score"
-        if (( $(echo "$score < 5" | bc -l) )); then
-          echo "Pylint score is below 5. Failing the pipeline."
-          exit 1
-        fi
+        pylint $(git ls-files '*.py')
       working-directory: backend
