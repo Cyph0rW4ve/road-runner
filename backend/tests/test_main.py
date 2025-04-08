@@ -5,29 +5,65 @@ from fastapi.testclient import TestClient
 from app.main import app
 from unittest.mock import MagicMock, patch
 from app.drivertimecalculator import DriverTimeCalculator
+from pydantic import BaseModel
+
+class CargoTypes(BaseModel):
+    id: str
+    cargo_name: str
+    cargo_type: str
 
 
+class Trucks(BaseModel):
+    id: str
+    name: str
+    fuel_tank: int
+    liters_per_100km: int
+    max_weight: int
 
 class TestDatabaseConnection(unittest.TestCase):
     client = TestClient(app)
-    def test_cargo_types(self):
+    
+    
+    @patch('app.main.get_db') 
+    def test_cargo_types(self, mock_get_db):
+        mock_db = MagicMock()
+        mock_get_db.return_value = mock_db
+        
+        mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = [
+            CargoTypes(id="C001", cargo_name="Cargo 1", cargo_type="Type 1"),
+            CargoTypes(id="C002", cargo_name="Cargo 2", cargo_type="Type 2")
+        ]
+        
         response_cargo = self.client.get("/cargo_types")
         cargo_types = response_cargo.json()
+
         self.assertEqual(response_cargo.status_code, 200)
         self.assertIsInstance(cargo_types, list)
         if cargo_types:
-            self.assertIn("id", cargo_types[1])
-            self.assertIn("cargo_name", cargo_types[1])
-            self.assertIn("cargo_type", cargo_types[1])
+            self.assertIn("id", cargo_types[0])
+            self.assertIn("cargo_name", cargo_types[0])
+            self.assertIn("cargo_type", cargo_types[0])
 
-    def test_trucks(self):
+    @patch('app.main.get_db')  
+    def test_trucks(self, mock_get_db):
+        mock_db = MagicMock()
+        mock_get_db.return_value = mock_db
+        
+        mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = [
+            Trucks(id="T001", brand="Brand A", name="Truck 1", fuel_tank=100, liters_per_100km=10, max_weight=3000),
+            Trucks(id="T002", brand="Brand B", name="Truck 2", fuel_tank=120, liters_per_100km=12, max_weight=3500)
+        ]
+        
         response_trucks = self.client.get("/trucks")
         trucks = response_trucks.json()
+
         self.assertIsInstance(trucks, list)
         if trucks:
-            self.assertIn("id", trucks[1])
-            self.assertIn("name", trucks[1])
-            self.assertIn("fuel_tank", trucks[1])
+            self.assertIn("id", trucks[0])
+            self.assertIn("name", trucks[0])
+            self.assertIn("fuel_tank", trucks[0])
+            self.assertIn("liters_per_100km", trucks[0])
+            self.assertIn("max_weight", trucks[0])
 
 
     def test_google_maps_api_connection(self):
