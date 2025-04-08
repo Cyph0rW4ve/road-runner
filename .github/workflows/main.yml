@@ -77,7 +77,7 @@ jobs:
     - name: Run Pylint
       working-directory: backend
       run: |
-        pylint_output=$(pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
+        pylint_output=$(timeout 120 pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
 
         # Print the full pylint output for debugging purposes
         echo "$pylint_output"
