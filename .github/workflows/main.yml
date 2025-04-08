@@ -58,11 +58,22 @@ jobs:
     needs: install-dependencies
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Reinstall dependencies (if needed)
+      working-directory: backend
+      run: pip install -r requirements.txt
 
 
     - name: Run Pylint
-      working-directory: backend
       run: |
+        cd backend
         pylint_output=$(pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
         echo "$pylint_output"
         exit 0
