@@ -73,6 +73,20 @@ class Employee(Base):
     password = Column(VARCHAR(50), nullable=False)  
     role = Column(VARCHAR(50), nullable=False)
 
+class Routes(Base):
+    __tablename__ = "routes"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    from_location = Column(VARCHAR(255), nullable=False)
+    to_location = Column(VARCHAR(255), nullable=False)
+    cargo_weight = Column(Integer, nullable=False)
+    deadline = Column(String(100), nullable=False)
+    truck = Column(String(100), nullable=False)
+    cargo = Column(String(100), nullable=False)
+    distance = Column(String(50), nullable=False)
+    duration = Column(String(100), nullable=False)
+
+
 app = FastAPI()
 
 def calculate_distance_and_duration(from_location: str, to_location: str):
@@ -114,27 +128,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/calculateRoute")
-def return_calculated_route(driversRoute: DriversRoute):
-    distance, duration = calculate_distance_and_duration(driversRoute.from_location, driversRoute.to_location)
-
-    driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
-
-    fuel_tank, consumption = fetch_trucks(driversRoute.truck)
-
-    needed_stops = FuelConsumptionCalculator().calculate_stops(distance, fuel_tank, consumption)
-    total_duration = driver_time_calculator.calculate_time("D001", duration, needed_stops)
-    return {
-        "from": driversRoute.from_location,
-        "to": driversRoute.to_location,
-        "cargo_weight": driversRoute.cargo_weight,
-        "deadline": driversRoute.deadline,
-        "truck": driversRoute.truck,
-        "cargo": driversRoute.cargo,
-        "distance": distance,
-        "duration": total_duration
-    }
-
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
@@ -145,6 +138,43 @@ def get_db() -> Session:
         yield db
     finally:
         db.close()
+
+@app.post("/calculateRoute")
+def return_calculated_route(driversRoute: DriversRoute, db: Session = Depends(get_db)):
+    distance, duration = calculate_distance_and_duration(driversRoute.from_location, driversRoute.to_location)
+
+    driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
+
+    fuel_tank, consumption = fetch_trucks(driversRoute.truck)
+
+    needed_stops = FuelConsumptionCalculator().calculate_stops(distance, fuel_tank, consumption)
+    total_duration = driver_time_calculator.calculate_time("D001", duration, needed_stops)
+
+    new_route = Routes(
+        from_location=driversRoute.from_location,
+        to_location=driversRoute.to_location,
+        cargo_weight=driversRoute.cargo_weight,
+        deadline=driversRoute.deadline,
+        truck=driversRoute.truck,
+        cargo=driversRoute.cargo,
+        distance=distance,
+        duration=total_duration
+    )
+
+    db.add(new_route)
+    db.commit()
+    db.refresh(new_route)
+
+    return {
+        "from": driversRoute.from_location,
+        "to": driversRoute.to_location,
+        "cargo_weight": driversRoute.cargo_weight,
+        "deadline": driversRoute.deadline,
+        "truck": driversRoute.truck,
+        "cargo": driversRoute.cargo,
+        "distance": distance,
+        "duration": total_duration
+    }
 
 @app.get("/cargo_types/", response_model=List[CargoTypesResponse])
 def read_cargo_types(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
