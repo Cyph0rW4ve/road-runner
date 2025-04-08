@@ -3,7 +3,8 @@ name: RoadRunner Action
 on:
   push:
     branches:
-      - main
+      - develop
+
 
 jobs:
   install-dependencies:
