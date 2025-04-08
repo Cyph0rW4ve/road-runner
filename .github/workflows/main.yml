@@ -76,6 +76,7 @@ jobs:
 
     - name: Run Pylint
       run: |
+        cd backend
         pylint_output=$(pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
 
         # Print the full pylint output for debugging purposes
