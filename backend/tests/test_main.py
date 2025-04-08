@@ -2,69 +2,56 @@ import unittest
 import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from app.main import app
+from app.main import app, get_db, CargoTypes, Trucks
 from unittest.mock import MagicMock, patch
 from app.drivertimecalculator import DriverTimeCalculator
 from pydantic import BaseModel
 
-class CargoTypes(BaseModel):
-    id: str
-    cargo_name: str
-    cargo_type: str
 
 
-class Trucks(BaseModel):
-    id: str
-    name: str
-    fuel_tank: int
-    liters_per_100km: int
-    max_weight: int
+client = TestClient(app)
 
 class TestDatabaseConnection(unittest.TestCase):
-    client = TestClient(app)
     
     
-    # @patch('app.main.get_db')
-    # def test_cargo_types(self, mock_get_db):
-    #     mock_db = MagicMock()
-    #     mock_get_db.return_value = mock_db
+    
+    def setUp(self):
+        self.mock_db = MagicMock()
 
-    #     mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = [
-    #         CargoTypes(id="C001", cargo_name="Cargo 1", cargo_type="Type 1"),
-    #         CargoTypes(id="C002", cargo_name="Cargo 2", cargo_type="Type 2")
-    #     ]
+        self.mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = [
+            CargoTypes(id="C001", cargo_name="Food", cargo_type="Perishable"),
+            CargoTypes(id="C002", cargo_name="Steel", cargo_type="Heavy")
+        ]
 
-    #     response_cargo = self.client.get("/cargo_types")
-    #     cargo_types = response_cargo.json()
+        app.dependency_overrides[get_db] = lambda: self.mock_db
 
-    #     self.assertEqual(response_cargo.status_code, 200)
-    #     self.assertIsInstance(cargo_types, list)
-    #     if cargo_types:
-    #         self.assertIn("id", cargo_types[0])
-    #         self.assertIn("cargo_name", cargo_types[0])
-    #         self.assertIn("cargo_type", cargo_types[0])
+    def tearDown(self):
+        app.dependency_overrides.clear()
 
-    # @patch('app.main.get_db')
-    # def test_trucks(self, mock_get_db):
-    #     mock_db = MagicMock()
-    #     mock_get_db.return_value = mock_db
+    def test_cargo_types(self):
+        response = client.get("/cargo_types/")
+        data = response.json()
 
-    #     mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = [
-    #         Trucks(id="T001", brand="Brand A", name="Truck 1", fuel_tank=100, liters_per_100km=10, max_weight=3000),
-    #         Trucks(id="T002", brand="Brand B", name="Truck 2", fuel_tank=120, liters_per_100km=12, max_weight=3500)
-    #     ]
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(data, list)
+        self.assertGreater(len(data), 0)
+        self.assertIn("cargo_name", data[0])
+        self.assertEqual(data[0]["cargo_name"], "Food")
 
-    #     response_trucks = self.client.get("/trucks")
-    #     trucks = response_trucks.json()
+    def test_trucks(self):
+        self.mock_db.query.return_value.offset.return_value.limit.return_value.all.return_value = [
+            Trucks(id="T001", brand="Volvo", name="BigTruck", fuel_tank=400, liters_per_100km=30, max_weight=20000),
+            Trucks(id="T002", brand="Scania", name="FastTruck", fuel_tank=500, liters_per_100km=25, max_weight=25000)
+        ]
 
-    #     self.assertEqual(response_trucks.status_code, 200)
-    #     self.assertIsInstance(trucks, list)
-    #     if trucks:
-    #         self.assertIn("id", trucks[0])
-    #         self.assertIn("name", trucks[0])
-    #         self.assertIn("fuel_tank", trucks[0])
-    #         self.assertIn("liters_per_100km", trucks[0])
-    #         self.assertIn("max_weight", trucks[0])
+        response = client.get("/trucks/")
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(data, list)
+        self.assertGreater(len(data), 0)
+        self.assertIn("brand", data[0])
+        self.assertEqual(data[0]["brand"], "Volvo")
 
     def test_google_maps_api_connection(self):
         api_key = "AIzaSyBT_yW-Nz6zIbKidF_WgaKG3o17xeOI6-c"
