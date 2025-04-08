@@ -76,7 +76,7 @@ jobs:
 
     - name: Run Pylint
       run: |
-         pylint_output=$(pylint $(git ls-files '*.py') --max-line-length=100 --output-format=text)
+        pylint_output=$(pylint $(git ls-files '*.py') --max-line-length=100 --output-format=text)
         
         # Print the output for debugging purposes
         echo "$pylint_output"
