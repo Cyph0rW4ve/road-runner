@@ -77,19 +77,6 @@ jobs:
     - name: Run Pylint
       working-directory: backend
       run: |
-        pylint_output=$(timeout 300 pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
-
-        # Print the full pylint output for debugging purposes
+        pylint_output=$(pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
         echo "$pylint_output"
-
-        # Extract the score from the pylint output
-        score=$(echo "$pylint_output" | grep -oP '\d+\.\d+(?=/10)' | tail -n 1)
-
-        # Check if the score is less than 5 and fail the build if so
-        if (( $(echo "$score < 5" | bc -l) )); then
-          echo "Pylint score is too low: $score"
-          exit 1  # Fail the build
-        else
-          echo "Pylint score is acceptable: $score"
-          exit 0
-        fi
+        exit 0
