@@ -3,8 +3,9 @@ import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from backend.main import app
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from drivertimecalculator import DriverTimeCalculator
+
 
 class TestDatabaseConnection(unittest.TestCase):
     client = TestClient(app)
@@ -50,6 +51,26 @@ class TestDatabaseConnection(unittest.TestCase):
         data = response.json()
         self.assertIn("results", data, "Antwort enthält keine 'results'")
         self.assertGreater(len(data["results"]), 0, "Keine Ergebnisse zurückgegeben")
+    
+    @patch('requests.get') 
+    def test_mock_google_maps_api_connection(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            "results": ["some result"]
+        }
+
+        url = "https://maps.googleapis.com/maps/api/geocode/json"
+        params = {
+            "address": "Berlin",
+            "key": "fake_api_key" 
+        }
+
+        response = requests.get(url, params=params)
+
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertIn("results", data)
+        self.assertGreater(len(data["results"]), 0)
 
    # def test_drive_duration(self):      # richtige dauer bei Auftrag von 10 Std
    #     class DriverTimeCalculator(unittest.TestCase):
