@@ -1,11 +1,32 @@
 name: RoadRunner Action
+
 on:
   push:
     branches:
       - main
 
 jobs:
-  First-Test-Job:
+  test:
+    name: Run backend tests
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "This is triggered by a push on main"
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run unittests
+        run: |
+          source venv/bin/activate
+          python -m unittest discover -s tests -p "test_*.py"
