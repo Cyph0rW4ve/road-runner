@@ -3,6 +3,8 @@ import requests
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from backend.main import app
+from unittest.mock import MagicMock
+from drivertimecalculator import DriverTimeCalculator
 
 class TestDatabaseConnection(unittest.TestCase):
     client = TestClient(app)
@@ -48,6 +50,20 @@ class TestDatabaseConnection(unittest.TestCase):
         data = response.json()
         self.assertIn("results", data, "Antwort enthält keine 'results'")
         self.assertGreater(len(data["results"]), 0, "Keine Ergebnisse zurückgegeben")
+
+   # def test_drive_duration(self):      # richtige dauer bei Auftrag von 10 Std
+   #     class DriverTimeCalculator(unittest.TestCase):
+
+    def test_calculate_time_shorter_than_remaining_time(self):
+        #given
+        remaining_drive_time = 36000  # 10 Stunden
+        obj = drivertimecalculator.DriverTimeCalculator()  # <- Ersetze das mit dem Klassennamen, in dem calculate_time steckt
+        #then
+        result = obj.calculate_time(remaining_drive_time)
+        #when
+        expectedResult = 75600
+        self.assertEqual(result, expectedResult)
+
 
 if __name__ == '__main__':
     unittest.main()
