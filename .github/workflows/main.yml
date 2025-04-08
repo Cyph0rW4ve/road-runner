@@ -90,5 +90,6 @@ jobs:
           exit 1  # Fail the build
         else
           echo "Pylint score is acceptable: $score"
+          exit 0
         fi
       working-directory: backend
