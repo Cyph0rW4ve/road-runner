@@ -105,7 +105,7 @@ class TestCalculateTime(unittest.TestCase):
     def test_calculate_time_exceeds_drive_time(self):
         driver_id = "0001"
         calculated_route_duration = 36000  # 10 hours in seconds
-        needed_stops = 1
+        needed_stops = 0
         # 36000 + 2700 (small break) + 39600 (big break) = 78300
         expected_total_duration = 78300
 
