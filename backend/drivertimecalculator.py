@@ -1,5 +1,4 @@
 from driver import Driver
-from fastapi.middleware.cors import CORSMiddleware
 
 
 class DriverTimeCalculator:

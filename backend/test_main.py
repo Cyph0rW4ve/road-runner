@@ -77,12 +77,15 @@ class TestDatabaseConnection(unittest.TestCase):
 
     def test_calculate_time_shorter_than_remaining_time(self):
         #given
-        remaining_drive_time = 36000  # 10 Stunden
-        obj = drivertimecalculator.DriverTimeCalculator()  # <- Ersetze das mit dem Klassennamen, in dem calculate_time steckt
+        driver_id = "D001"
+        remaining_delivery_time = 36000  # 10 Stunden
+        remaining_drive_time = 32400
+        needed_stops = 0
+        obj = DriverTimeCalculator()  # <- Ersetze das mit dem Klassennamen, in dem calculate_time steckt
         #then
-        result = obj.calculate_time(remaining_drive_time)
+        result = obj.calculate_time(driver_id, remaining_delivery_time, needed_stops)
         #when
-        expectedResult = 75600
+        expectedResult = 78900
         self.assertEqual(result, expectedResult)
 
 
