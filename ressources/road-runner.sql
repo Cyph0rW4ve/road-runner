@@ -92,3 +92,16 @@ CREATE TABLE employees (
 
 INSERT INTO employees (id, user_name, password, role)
 VALUES (1, "lorenzo@roadrunner.com", "$2a$12$wgDQurvFlCAca40IgHUguOmmoK0oJTjvynU1.ZSk/PnG01wsf8wVK", "driver");
+
+CREATE TABLE routes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    from_location VARCHAR(255) NOT NULL,
+    to_location VARCHAR(255) NOT NULL,
+    cargo_weight INT NOT NULL,
+    deadline VARCHAR(100) NOT NULL,
+    truck VARCHAR(100) NOT NULL,
+    cargo VARCHAR(100) NOT NULL,
+    distance VARCHAR(50) NOT NULL,
+    duration VARCHAR(100) NOT NULL
+);
+
