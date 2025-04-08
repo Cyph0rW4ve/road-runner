@@ -76,13 +76,13 @@ jobs:
 
     - name: Run Pylint
       run: |
-        pylint_output=$(pylint $(git ls-files '*.py') --max-line-length=100 --output-format=text --jobs=4)
-        
-        # Print the output for debugging purposes
+        pylint_output=$(pylint --max-line-length=100 --output-format=text $(git ls-files '*.py'))
+
+        # Print the full pylint output for debugging purposes
         echo "$pylint_output"
 
         # Extract the score from the pylint output
-        score=$(echo "$pylint_output" | tail -n 1 | awk '{print $1}')
+        score=$(echo "$pylint_output" | grep -oP '\d+\.\d+(?=/10)' | tail -n 1)
 
         # Check if the score is less than 5 and fail the build if so
         if (( $(echo "$score < 5" | bc -l) )); then
