@@ -1,5 +1,6 @@
 import mysql.connector
 
+
 def fetch_trucks(truck_name):
     mydb = mysql.connector.connect(
         host="localhost",
@@ -9,7 +10,10 @@ def fetch_trucks(truck_name):
     )
 
     mycursor = mydb.cursor()
-    mycursor.execute("SELECT fuel_tank, liters_per_100km FROM trucks WHERE brand = %s", (truck_name,))
+    mycursor.execute(
+        "SELECT fuel_tank, liters_per_100km FROM trucks WHERE brand = %s",
+        (truck_name,
+         ))
     myresult = mycursor.fetchall()
 
     fuel_tank = myresult[0][0]

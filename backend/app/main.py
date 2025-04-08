@@ -22,20 +22,21 @@ gmaps = googlemaps.Client(key="AIzaSyBT_yW-Nz6zIbKidF_WgaKG3o17xeOI6-c")
 
 class CargoTypes(Base):
     __tablename__ = "cargo_types"
-    
+
     id = Column(CHAR(4), primary_key=True, index=True)
     cargo_name = Column(VARCHAR(255), nullable=False)
     cargo_type = Column(VARCHAR(255), nullable=False)
 
+
 class Trucks(Base):
     __tablename__ = "trucks"
-    
+
     id = Column(CHAR(4), primary_key=True, index=True)
-    brand = Column(VARCHAR(255))  
-    name = Column(VARCHAR(255))   
-    fuel_tank = Column(Integer)    
-    liters_per_100km = Column(Integer)  
-    max_weight = Column(Integer)   
+    brand = Column(VARCHAR(255))
+    name = Column(VARCHAR(255))
+    fuel_tank = Column(Integer)
+    liters_per_100km = Column(Integer)
+    max_weight = Column(Integer)
 
 
 class CargoTypesResponse(BaseModel):
@@ -45,6 +46,7 @@ class CargoTypesResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class TrucksResponse(BaseModel):
     id: str
@@ -57,6 +59,7 @@ class TrucksResponse(BaseModel):
     class Config:
         orm_mode = True
 
+
 class DriversRoute(BaseModel):
     from_location: str
     to_location: str
@@ -65,13 +68,15 @@ class DriversRoute(BaseModel):
     truck: str
     cargo: str
 
+
 class Employee(Base):
     __tablename__ = "employees"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     user_name = Column(VARCHAR(50), unique=True, nullable=False)
-    password = Column(VARCHAR(50), nullable=False)  
+    password = Column(VARCHAR(50), nullable=False)
     role = Column(VARCHAR(50), nullable=False)
+
 
 class Routes(Base):
     __tablename__ = "routes"
@@ -89,8 +94,9 @@ class Routes(Base):
 
 app = FastAPI()
 
+
 def calculate_distance_and_duration(from_location: str, to_location: str):
-    try: 
+    try:
         directions_result = gmaps.directions(from_location, to_location)
         distance = directions_result[0]['legs'][0]['distance']['text']
         duration = directions_result[0]['legs'][0]['duration']['value']
@@ -100,17 +106,22 @@ def calculate_distance_and_duration(from_location: str, to_location: str):
         print(f"Error fetching directions: {e}")
         raise HTTPException(status_code=500, detail="Error calculating route")
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+
 def get_user(db: Session, user_name: str):
     return db.query(Employee).filter(Employee.user_name == user_name).first()
+
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 origins = [
     "http://localhost:3000",
@@ -128,9 +139,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
+
 
 def get_db() -> Session:
     db = SessionLocal()
@@ -139,16 +152,22 @@ def get_db() -> Session:
     finally:
         db.close()
 
+
 @app.post("/calculateRoute")
-def return_calculated_route(driversRoute: DriversRoute, db: Session = Depends(get_db)):
-    distance, duration = calculate_distance_and_duration(driversRoute.from_location, driversRoute.to_location)
+def return_calculated_route(
+        driversRoute: DriversRoute,
+        db: Session = Depends(get_db)):
+    distance, duration = calculate_distance_and_duration(
+        driversRoute.from_location, driversRoute.to_location)
 
     driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
 
     fuel_tank, consumption = fetch_trucks(driversRoute.truck)
 
-    needed_stops = FuelConsumptionCalculator().calculate_stops(distance, fuel_tank, consumption)
-    total_duration = driver_time_calculator.calculate_time("D001", duration, needed_stops)
+    needed_stops = FuelConsumptionCalculator().calculate_stops(
+        distance, fuel_tank, consumption)
+    total_duration = driver_time_calculator.calculate_time(
+        "D001", duration, needed_stops)
 
     new_route = Routes(
         from_location=driversRoute.from_location,
@@ -176,14 +195,19 @@ def return_calculated_route(driversRoute: DriversRoute, db: Session = Depends(ge
         "duration": total_duration
     }
 
+
 @app.get("/cargo_types/", response_model=List[CargoTypesResponse])
-def read_cargo_types(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def read_cargo_types(
+        skip: int = 0,
+        limit: int = 10,
+        db: Session = Depends(get_db)):
     try:
         cargo_types = db.query(CargoTypes).offset(skip).limit(limit).all()
         return cargo_types
     except Exception as e:
-        print(f"Error fetching cargo types: {e}")  
+        print(f"Error fetching cargo types: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
+
 
 @app.get("/trucks/", response_model=List[TrucksResponse])
 def read_trucks(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
@@ -191,16 +215,21 @@ def read_trucks(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
         truck_items = db.query(Trucks).offset(skip).limit(limit).all()
         return truck_items
     except Exception as e:
-        print(f"Error fetching trucks: {e}")  
+        print(f"Error fetching trucks: {e}")
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
+
 @app.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: Session = Depends(get_db)):
     user = get_user(db, form_data.username)
     if not user or not verify_password(form_data.password, user.password):
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    
+        raise HTTPException(status_code=400,
+                            detail="Incorrect username or password")
+
     if user.role != "driver":
-        raise HTTPException(status_code=403, detail="Access forbidden: not a driver")
-    
+        raise HTTPException(status_code=403,
+                            detail="Access forbidden: not a driver")
+
     return {"message": "Login successful", "role": user.role}

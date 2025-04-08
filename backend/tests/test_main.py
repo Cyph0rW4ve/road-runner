@@ -7,14 +7,11 @@ from unittest.mock import MagicMock, patch
 from app.drivertimecalculator import DriverTimeCalculator
 from pydantic import BaseModel
 
-
-
 client = TestClient(app)
 
+
 class TestDatabaseConnection(unittest.TestCase):
-    
-    
-    
+
     def setUp(self):
         self.mock_db = MagicMock()
 
@@ -67,8 +64,8 @@ class TestDatabaseConnection(unittest.TestCase):
         data = response.json()
         self.assertIn("results", data, "Antwort enthält keine 'results'")
         self.assertGreater(len(data["results"]), 0, "Keine Ergebnisse zurückgegeben")
-    
-    @patch('requests.get') 
+
+    @patch('requests.get')
     def test_mock_google_maps_api_connection(self, mock_get):
         mock_get.return_value.status_code = 200
         mock_get.return_value.json.return_value = {
@@ -78,7 +75,7 @@ class TestDatabaseConnection(unittest.TestCase):
         url = "https://maps.googleapis.com/maps/api/geocode/json"
         params = {
             "address": "Berlin",
-            "key": "fake_api_key" 
+            "key": "fake_api_key"
         }
 
         response = requests.get(url, params=params)
@@ -96,11 +93,10 @@ class TestCalculateTime(unittest.TestCase):
         self.driver.update_free_drive_time = MagicMock()
         self.driver.small_break = MagicMock()
         self.driver.big_break = MagicMock()
-        
-        self.calculator = DriverTimeCalculator() 
+
+        self.calculator = DriverTimeCalculator()
         self.calculator.driver = self.driver
         self.calculator.drivable_seconds_per_day = 32400  # 9 hours in seconds
-
 
     def test_calculate_time_exceeds_drive_time(self):
         driver_id = "0001"
@@ -114,7 +110,6 @@ class TestCalculateTime(unittest.TestCase):
         total_duration = self.calculator.calculate_time(driver_id, calculated_route_duration, needed_stops)
 
         self.assertEqual(total_duration, expected_total_duration)
-
 
 
 if __name__ == '__main__':
