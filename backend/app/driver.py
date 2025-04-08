@@ -8,7 +8,6 @@ class Driver:
         self.open_break_duration: int = 0
         self.available_for_next_job = None
 
-
     def read_stats(self):
         pass
 
