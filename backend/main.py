@@ -9,10 +9,10 @@ import googlemaps
 import drivertimecalculator
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+from fuel_consumption_calculator import FuelConsumptionCalculator
+from fetchtrucks import fetch_trucks
 
-
-
-DATABASE_URL = "mysql+pymysql://root:MoneyInTheBank24!@localhost/road_runner"
+DATABASE_URL = "mysql+pymysql://root:1234@localhost/road_runner"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -119,7 +119,11 @@ def return_calculated_route(driversRoute: DriversRoute):
     distance, duration = calculate_distance_and_duration(driversRoute.from_location, driversRoute.to_location)
 
     driver_time_calculator = drivertimecalculator.DriverTimeCalculator()
-    total_duration = driver_time_calculator.calculate_time("D001", duration)
+
+    fuel_tank, consumption = fetch_trucks(driversRoute.truck)
+
+    needed_stops = FuelConsumptionCalculator().calculate_stops(distance, fuel_tank, consumption)
+    total_duration = driver_time_calculator.calculate_time("D001", duration, needed_stops)
     return {
         "from": driversRoute.from_location,
         "to": driversRoute.to_location,

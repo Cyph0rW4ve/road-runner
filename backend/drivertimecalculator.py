@@ -11,10 +11,12 @@ class DriverTimeCalculator:
         self.total_duration = 0
         self.remaining_delivery_time = 0
 
-    def calculate_time(self, driver_id, calculated_route_duration):
+    def calculate_time(self, driver_id, calculated_route_duration, needed_stops):
         #self.driver.new_driver(driver_id)
         self.total_duration = calculated_route_duration
         self.remaining_delivery_time = calculated_route_duration
+
+        self.total_duration += needed_stops * 10 * 60  # add 10m minutes to total duration for each stop
 
         remaining_drive_time_today = self.driver.get_remaining_drive_time()
 

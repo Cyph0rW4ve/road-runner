@@ -60,11 +60,11 @@ CREATE TABLE trucks (
 
 INSERT INTO trucks (id, brand, name, fuel_tank, liters_per_100km, max_weight, horsepower)
 VALUES
-    ('0000', 'Scania', 'R2016', 700, 30, 25500, 730),
-    ('0001', 'Volvo', 'FH16 2016', 600, 25, 26000, 750),
-    ('0002', 'Mercedes', 'Actrod', 650, 35, 24000, 625),
-    ('0003', 'MAN', 'TGX EURO 6', 550, 28, 24500, 640),
-    ('0004', 'Renault', 'T', 500, 32, 23000, 520);
+    ('0000', 'Scania', 'R2016', 350, 30, 25500, 730),
+    ('0001', 'Volvo', 'FH16 2016', 300, 25, 26000, 750),
+    ('0002', 'Mercedes', 'Actrod', 325, 35, 24000, 625),
+    ('0003', 'MAN', 'TGX EURO 6', 275, 28, 24500, 640),
+    ('0004', 'Renault', 'T', 250, 32, 23000, 520);
 
 
 # Create owned trucks table
@@ -85,8 +85,8 @@ CREATE TABLE drivers (
 
 CREATE TABLE employees (
     id int NOT NULL PRIMARY KEY,
-    user_name varchar(50),
-    password varchar(50),
+    user_name varchar(255),
+    password varchar(255),
     role varchar(50)
 );
 
