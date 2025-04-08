@@ -58,23 +58,29 @@ jobs:
     needs: install-dependencies
     runs-on: ubuntu-latest
     steps:
-
     - name: Checkout repo
       uses: actions/checkout@v2
-
 
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
-
-    - name: Install dependencies
+    - name: Reinstall dependencies (if needed)
       working-directory: backend
       run: pip install -r requirements.txt
 
 
     - name: Run Pylint
-      run: |
-        pylint $(git ls-files '*.py')
       working-directory: backend
+      run: |
+        score=$(pylint --max-line-length=100 --output-format=text $(git ls-files '*.py') | grep -oP '\d+\.\d+(?=/10)' | tail -n 1)
+        echo "Pylint score: $score"
+
+        if (( $(echo "$score >= 5" | bc -l) )); then
+          echo "Pylint score is acceptable."
+          exit 0
+        else
+          echo "Pylint score is too low."
+          exit 1
+        fi
