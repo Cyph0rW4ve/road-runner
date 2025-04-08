@@ -4,7 +4,7 @@ def fetch_trucks(truck_name):
     mydb = mysql.connector.connect(
         host="localhost",
         user='root',
-        password='1234',
+        password='MoneyInTheBank24!',
         database='road_runner'
     )
 
